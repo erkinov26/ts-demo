@@ -10,9 +10,9 @@ const store = configureStore({
 	reducer: {
 		auth: authReducer,
 		todos: userReducer,
-		delete: deleteReducer,
-		create: addTodoReducer,
-		edit: editTodoReducer,
+		createTodo: addTodoReducer,
+		deleteTodo: deleteReducer,
+		editTodo: editTodoReducer,
 	},
 });
 

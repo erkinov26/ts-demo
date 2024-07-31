@@ -16,7 +16,7 @@ import { AppDispatch } from "@/store/store";
 
 export function Table() {
 	const { todos, loading } = useSelector((state: RootState) => state.todos);
-	const deleteState = useSelector((state: RootState) => state.delete);
+	const deleteState = useSelector((state: RootState) => state.deleteTodo);
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 

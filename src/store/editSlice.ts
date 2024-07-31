@@ -23,7 +23,7 @@ const initialState: EditTodoState = {
 export const editTodo = createAsyncThunk<
 	EditTodoType,
 	{ id: number; updatedTodo: EditTodoType }
->("editTodo", async ({ id, updatedTodo }) => {
+>("edit", async ({ id, updatedTodo }) => {
 	const response = await fetch(`https://dummyjson.com/todos/${id}`, {
 		method: "PUT",
 		headers: { "Content-Type": "application/json" },
