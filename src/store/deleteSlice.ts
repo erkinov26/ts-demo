@@ -12,23 +12,23 @@ const initialState: DeleteState = {
 	error: null,
 };
 
-export const deleteItem = createAsyncThunk<string, number>(
-	"delete",
-	async (id) => {
-		const response = await fetch(`https://dummyjson.com/todos/${id}`, {
-			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-		if (!response.ok) {
-			const error = await response.text();
-			throw new Error(error);
-		}
-		const data = await response.json();
-		return data;
-	},
-);
+export const deleteItem = createAsyncThunk<
+	number,
+	number,
+	{ rejectValue: string }
+>("delete", async (id: number) => {
+	const response = await fetch(`https://dummyjson.com/todos/${id}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+	if (!response.ok) {
+		console.log("err");
+	}
+	await response.json();
+	return id;
+});
 
 const deleteSlice = createSlice({
 	name: "delete",

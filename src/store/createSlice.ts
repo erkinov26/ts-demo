@@ -1,9 +1,12 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+// createSlice.ts
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+
 interface newTodoType {
 	todo: string;
 	completed: boolean;
-	userId: number;
+	userId?: number;
 }
+
 interface AddTodoState {
 	pending: boolean;
 	success: boolean;
@@ -17,22 +20,25 @@ const initialState: AddTodoState = {
 	error: null,
 	newTodo: null,
 };
-export const addTodo = createAsyncThunk<newTodoType>(
-	"addTodo",
-	async (newTodo) => {
-		const response = await fetch("https://dummyjson.com/todos/add", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(newTodo),
-		});
-		if (!response.ok) {
-			const error = await response.text();
-			throw new Error(error);
-		}
-		const data = await response.json();
-		return data;
-	},
-);
+
+export const addTodo = createAsyncThunk<
+	newTodoType,
+	newTodoType,
+	{ rejectValue: string }
+>("addTodo", async (newTodo: newTodoType, { rejectWithValue }) => {
+	const response = await fetch("https://dummyjson.com/todos/add", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(newTodo),
+	});
+	if (!response.ok) {
+		const error = await response.text();
+		return rejectWithValue(error);
+	}
+	const data = await response.json();
+	return data;
+});
+
 const addTodoSlice = createSlice({
 	name: "addTodo",
 	initialState,
@@ -51,18 +57,25 @@ const addTodoSlice = createSlice({
 				state.success = false;
 				state.error = null;
 			})
-			.addCase(addTodo.fulfilled, (state, action) => {
-				state.pending = false;
-				state.success = true;
-				state.error = null;
-				state.newTodo = action.payload;
-			})
-			.addCase(addTodo.rejected, (state, action) => {
-				state.pending = false;
-				state.success = false;
-				state.error = action.payload as string;
-			});
+			.addCase(
+				addTodo.fulfilled,
+				(state, action: PayloadAction<newTodoType>) => {
+					state.pending = false;
+					state.success = true;
+					state.error = null;
+					state.newTodo = action.payload;
+				},
+			)
+			.addCase(
+				addTodo.rejected,
+				(state, action: PayloadAction<string | undefined>) => {
+					state.pending = false;
+					state.success = false;
+					state.error = action.payload || "Failed to add todo";
+				},
+			);
 	},
 });
+
 export const { resetAddTodoState } = addTodoSlice.actions;
 export const addTodoReducer = addTodoSlice.reducer;

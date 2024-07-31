@@ -5,6 +5,7 @@ import { userReducer } from "./usersSlice";
 import { deleteReducer } from "./deleteSlice";
 import { addTodoReducer } from "./createSlice";
 import { editTodoReducer } from "./editSlice";
+
 const store = configureStore({
 	reducer: {
 		auth: authReducer,

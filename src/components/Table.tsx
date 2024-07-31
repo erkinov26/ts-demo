@@ -12,11 +12,12 @@ import { Button } from "@/components/ui/button";
 import { deleteItem, resetDeleteState } from "@/store/deleteSlice";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { AppDispatch } from "@/store/store";
 
 export function Table() {
 	const { todos, loading } = useSelector((state: RootState) => state.todos);
 	const deleteState = useSelector((state: RootState) => state.delete);
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 
 	useEffect(() => {

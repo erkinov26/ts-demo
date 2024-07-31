@@ -12,41 +12,44 @@ export interface TodosState {
 	loading: boolean;
 	error: string;
 }
+
 const initialState: TodosState = {
 	todos: [],
 	loading: false,
 	error: "",
 };
 
-export const getUsers = createAsyncThunk("todos", async () => {
-	return fetch("https://dummyjson.com/todos")
-		.then((res) => res.json())
-		.then((data) => {
-			console.log(data);
-			return data.todos;
-		});
-});
+export const getUsers = createAsyncThunk<Todo[], void, { rejectValue: string }>(
+	"todos",
+	async (_, { rejectWithValue }) => {
+		const response = await fetch("https://dummyjson.com/todos");
+		if (!response.ok) {
+			const error = await response.text();
+			return rejectWithValue(error);
+		}
+		const data = await response.json();
+		return data.todos;
+	},
+);
 
 export const userSlice = createSlice({
 	name: "users",
 	initialState,
 	reducers: {},
-	extraReducers(builder) {
+	extraReducers: (builder) => {
 		builder
 			.addCase(getUsers.pending, (state) => {
 				state.loading = true;
 			})
 			.addCase(getUsers.fulfilled, (state, action) => {
-				console.log(action.payload, "awdaw");
-
 				state.loading = false;
 				state.todos = action.payload;
 				state.error = "";
 			})
-			.addCase(getUsers.rejected, (state) => {
+			.addCase(getUsers.rejected, (state, action) => {
 				state.loading = false;
 				state.todos = null;
-				state.error = "Something went wrong";
+				state.error = action.payload || "Something went wrong";
 			});
 	},
 });

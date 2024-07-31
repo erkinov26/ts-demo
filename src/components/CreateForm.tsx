@@ -50,7 +50,13 @@ export function TodoForm() {
 		if (todoId) {
 			dispatch(editTodo({ id: Number(todoId), updatedTodo: todoItem }));
 		} else {
-			dispatch(addTodo(todoItem));
+			dispatch(
+				addTodo({
+					todo: values.todo,
+					completed: false,
+					userId: 5,
+				}),
+			);
 		}
 	}
 

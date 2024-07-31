@@ -6,7 +6,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { loginFailure, loginRequest, loginSuccess } from "@/store/authSlice";
-import { RootState } from "@/store/store";
+import { RootState, AppDispatch } from "@/store/store";
 import { getUsers } from "@/store/usersSlice";
 
 interface DataType {
@@ -14,21 +14,9 @@ interface DataType {
 	password: string;
 }
 
-// fetch('https://dummyjson.com/auth/login', {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({
-
-//       username: 'emilys',
-//       password: 'emilyspass',
-//       expiresInMins: 30, // optional, defaults to 60
-//     })
-//   })
-//   .then(res => res.json())
-//   .then(console.log);
 export default function LoginPage() {
 	const { register, handleSubmit } = useForm<DataType>();
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const { error, pending } = useSelector((state: RootState) => state.auth);
 
 	const onSubmit: SubmitHandler<DataType> = async (data) => {
@@ -42,21 +30,19 @@ export default function LoginPage() {
 					password: data.password,
 					expiresInMins: 30,
 				}),
-			})
-				.then((res) => res.json())
-				.then((data) => {
-					return data;
-				});
-			if (response.id) {
-				Cookies.set("token", response.token);
+			});
+			const result = await response.json();
+			if (response.ok && result.id) {
+				Cookies.set("token", result.token);
 				dispatch(getUsers());
-				dispatch(loginSuccess(response));
-				dispatch(loginRequest(true));
+				dispatch(loginSuccess(result));
 			} else {
 				dispatch(loginFailure("Invalid email or password"));
 			}
 		} catch (error) {
 			dispatch(loginFailure("An error occurred. Please try again later."));
+		} finally {
+			dispatch(loginRequest(false));
 		}
 	};
 
